@@ -1,13 +1,63 @@
 <view class="container">
   <!-- 输入框区域 -->
   <view class="input-section">
-    <input 
-      class="todo-input" 
-      placeholder="添加新的待办事项..." 
-      bindinput="onInput"
-      value="{{inputValue}}"
-    />
-    <button class="add-btn" bindtap="addTodo">添加</button>
+    <view class="input-row">
+      <input 
+        class="todo-input" 
+        placeholder="添加新的待办事项..." 
+        bindinput="onInput"
+        value="{{inputValue}}"
+      />
+      <button class="add-btn" bindtap="addTodo">添加</button>
+    </view>
+    
+    <!-- 排序模式选择器 -->
+    <view class="sort-row">
+      <text class="sort-label">排序：</text>
+      <picker 
+        mode="selector" 
+        range="{{sortModes}}"
+        range-key="name"
+        bindchange="onSortModeChange"
+        value="{{sortModeIndex}}"
+      >
+        <view class="sort-picker-value">
+          {{sortModes[sortModeIndex].name}}
+        </view>
+      </picker>
+    </view>
+    
+    <!-- 重要性和紧急程度选择器 -->
+    <view class="selector-row">
+      <view class="selector-item">
+        <text class="selector-label">重要性：</text>
+        <picker 
+          mode="selector" 
+          range="{{importanceLevels}}"
+          bindchange="onImportanceChange"
+          value="{{importanceLevels.indexOf(selectedImportance)}}"
+        >
+          <view class="picker-value importance-{{selectedImportance}}">
+            {{selectedImportance}} 级
+          </view>
+        </picker>
+      </view>
+      
+      <view class="selector-item">
+        <text class="selector-label">紧急度：</text>
+        <picker 
+          mode="selector" 
+          range="{{urgencyLevels}}"
+          range-key=""
+          bindchange="onUrgencyChange"
+          value="{{urgencyLevels.indexOf(selectedUrgency)}}"
+        >
+          <view class="picker-value urgency-{{selectedUrgency}}">
+            {{selectedUrgency}} 级
+          </view>
+        </picker>
+      </view>
+    </view>
   </view>
 
   <!-- 待办事项列表 -->
@@ -24,24 +74,51 @@
         wx:key="id" 
         class="todo-item {{item.completed ? 'completed' : ''}}"
       >
-        <view class="todo-content">
+        <view class="todo-left">
+          <!-- 完成复选框 -->
           <checkbox 
             checked="{{item.completed}}" 
             bindtap="toggleTodo" 
             data-id="{{item.id}}"
+            color="#07c160"
           />
+          
+          <!-- 标签区域 -->
+          <view class="tags-row">
+            <!-- 重要性标签 -->
+            <view 
+              class="tag importance-tag importance-{{item.importance || 'A'}}" 
+              data-id="{{item.id}}"
+            >
+              重要：{{item.importance || 'A'}}
+            </view>
+            
+            <!-- 紧急程度标签 -->
+            <view 
+              class="tag urgency-tag urgency-{{item.urgency || 1}}" 
+              data-id="{{item.id}}"
+            >
+              紧急：{{item.urgency || 1}}
+            </view>
+          </view>
+          
+          <!-- 任务文本 -->
           <input 
             class="todo-text {{item.completed ? 'completed' : ''}}" 
             value="{{item.text}}" 
+            disabled="{{item.completed}}"
             bindblur="updateTodoText"
             data-id="{{item.id}}"
           />
         </view>
-        <view 
-          class="delete-btn" 
-          bindtap="deleteTodo" 
-          data-id="{{item.id}}"
-        >删除</view>
+        
+        <view class="todo-right">
+          <view 
+            class="delete-btn" 
+            bindtap="deleteTodo" 
+            data-id="{{item.id}}"
+          >删除</view>
+        </view>
       </view>
     </block>
   </view>
